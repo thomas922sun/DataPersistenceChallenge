@@ -18,10 +18,15 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    public Text BestScoreText;
+
+
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
+        UpdateHighestScoreUI();
+
+        //m_GameOver = false;
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -36,9 +41,10 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        
     }
 
-    private void Update()
+    public void Update()
     {
         if (!m_Started)
         {
@@ -55,10 +61,12 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            }
+            //if (Input.GetKeyDown(KeyCode.Space))
+            //{
+               
+            //}
+
+            return;
         }
     }
 
@@ -66,11 +74,36 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+
+        if (m_Points > ScoreRecorder.Instance.highestScore)
+        {
+            ScoreRecorder.Instance.highestScore = m_Points;
+            ScoreRecorder.Instance.highScorePlayerName = ScoreRecorder.Instance.thisPlayerName;
+            UpdateHighestScoreUI();
+
+            ScoreRecorder.Instance.SaveHighestScore();
+        }
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+
+    void UpdateHighestScoreUI()
+    {
+        BestScoreText.text = "Best: " + ScoreRecorder.Instance.highScorePlayerName + "  " + ScoreRecorder.Instance.highestScore;
+    }
+
+    public void Back2Home()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    public void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Debug.Log("Active Scene name is: " + SceneManager.GetActiveScene().name + "\nActive Scene index: " + SceneManager.GetActiveScene().buildIndex);
     }
 }
